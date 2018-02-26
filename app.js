@@ -9888,7 +9888,10 @@ var _kevinbgreene$elm_tutorial$Main$viewData = function (model) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html$text(
-						A2(_elm_lang$core$Basics_ops['++'], 'Code: ', model.code)),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'Code: ',
+							A2(_elm_lang$core$Maybe$withDefault, '', model.code))),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -9899,7 +9902,10 @@ var _kevinbgreene$elm_tutorial$Main$viewData = function (model) {
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(
-							A2(_elm_lang$core$Basics_ops['++'], 'Token: ', model.token)),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'Token: ',
+								A2(_elm_lang$core$Maybe$withDefault, '', model.token))),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
@@ -9910,7 +9916,10 @@ var _kevinbgreene$elm_tutorial$Main$viewData = function (model) {
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html$text(
-								A2(_elm_lang$core$Basics_ops['++'], 'JWT: ', model.jwt)),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'JWT: ',
+									A2(_elm_lang$core$Maybe$withDefault, '', model.jwt))),
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
@@ -9963,17 +9972,17 @@ var _kevinbgreene$elm_tutorial$Main$view = function (model) {
 		});
 };
 var _kevinbgreene$elm_tutorial$Main$jwtParser = A2(
-	_evancz$url_parser$UrlParser_ops['</>'],
+	_evancz$url_parser$UrlParser_ops['<?>'],
 	_evancz$url_parser$UrlParser$s('jwt'),
-	_evancz$url_parser$UrlParser$string);
+	_evancz$url_parser$UrlParser$stringParam('jwt'));
 var _kevinbgreene$elm_tutorial$Main$tokenParser = A2(
-	_evancz$url_parser$UrlParser_ops['</>'],
+	_evancz$url_parser$UrlParser_ops['<?>'],
 	_evancz$url_parser$UrlParser$s('token'),
-	_evancz$url_parser$UrlParser$string);
+	_evancz$url_parser$UrlParser$stringParam('token'));
 var _kevinbgreene$elm_tutorial$Main$codeParser = A2(
-	_evancz$url_parser$UrlParser_ops['</>'],
+	_evancz$url_parser$UrlParser_ops['<?>'],
 	_evancz$url_parser$UrlParser$s('code'),
-	_evancz$url_parser$UrlParser$string);
+	_evancz$url_parser$UrlParser$stringParam('code'));
 var _kevinbgreene$elm_tutorial$Main$homeParser = _evancz$url_parser$UrlParser$oneOf(
 	{
 		ctor: '::',
@@ -10026,13 +10035,13 @@ var _kevinbgreene$elm_tutorial$Main$parametersToString = function (model) {
 		':',
 		{
 			ctor: '::',
-			_0: model.code,
+			_0: A2(_elm_lang$core$Maybe$withDefault, '', model.code),
 			_1: {
 				ctor: '::',
-				_0: model.token,
+				_0: A2(_elm_lang$core$Maybe$withDefault, '', model.token),
 				_1: {
 					ctor: '::',
-					_0: model.jwt,
+					_0: A2(_elm_lang$core$Maybe$withDefault, '', model.jwt),
 					_1: {ctor: '[]'}
 				}
 			}
@@ -10043,22 +10052,17 @@ var _kevinbgreene$elm_tutorial$Main$pick = F2(
 		pick:
 		while (true) {
 			if (_elm_lang$core$Native_Utils.eq(n, 1)) {
-				var _p2 = _elm_lang$core$List$head(list);
-				if (_p2.ctor === 'Just') {
-					return _p2._0;
-				} else {
-					return '';
-				}
+				return _elm_lang$core$List$head(list);
 			} else {
-				var _p3 = _elm_lang$core$List$tail(list);
-				if (_p3.ctor === 'Just') {
-					var _v4 = n - 1,
-						_v5 = _p3._0;
-					n = _v4;
-					list = _v5;
+				var _p2 = _elm_lang$core$List$tail(list);
+				if (_p2.ctor === 'Just') {
+					var _v3 = n - 1,
+						_v4 = _p2._0;
+					n = _v3;
+					list = _v4;
 					continue pick;
 				} else {
-					return '';
+					return _elm_lang$core$Maybe$Nothing;
 				}
 			}
 		}
@@ -10077,20 +10081,20 @@ var _kevinbgreene$elm_tutorial$Main$parametersFromString = F2(
 		};
 	});
 var _kevinbgreene$elm_tutorial$Main$updateModel = function (model) {
-	var _p4 = model.route;
-	switch (_p4.ctor) {
+	var _p3 = model.route;
+	switch (_p3.ctor) {
 		case 'CodeRoute':
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{code: _p4._0});
+				{code: _p3._0});
 		case 'TokenRoute':
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{token: _p4._0});
+				{token: _p3._0});
 		case 'JwtRoute':
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{jwt: _p4._0});
+				{jwt: _p3._0});
 		case 'HomeRoute':
 			return model;
 		default:
@@ -10098,7 +10102,7 @@ var _kevinbgreene$elm_tutorial$Main$updateModel = function (model) {
 	}
 };
 var _kevinbgreene$elm_tutorial$Main$initialModel = function (route) {
-	return {route: route, code: '', token: '', jwt: ''};
+	return {route: route, code: _elm_lang$core$Maybe$Nothing, token: _elm_lang$core$Maybe$Nothing, jwt: _elm_lang$core$Maybe$Nothing};
 };
 var _kevinbgreene$elm_tutorial$Main$setStorage = _elm_lang$core$Native_Platform.outgoingPort(
 	'setStorage',
@@ -10107,9 +10111,9 @@ var _kevinbgreene$elm_tutorial$Main$setStorage = _elm_lang$core$Native_Platform.
 	});
 var _kevinbgreene$elm_tutorial$Main$updateWithStorage = F2(
 	function (msg, model) {
-		var _p5 = A2(_kevinbgreene$elm_tutorial$Main$update, msg, model);
-		var newModel = _p5._0;
-		var commands = _p5._1;
+		var _p4 = A2(_kevinbgreene$elm_tutorial$Main$update, msg, model);
+		var newModel = _p4._0;
+		var commands = _p4._1;
 		return {
 			ctor: '_Tuple2',
 			_0: newModel,
@@ -10167,20 +10171,20 @@ var _kevinbgreene$elm_tutorial$Main$routeParser = _evancz$url_parser$UrlParser$o
 var _kevinbgreene$elm_tutorial$Main$findRouteOrGoHome = F2(
 	function (maybeString, location) {
 		var route = function () {
-			var _p6 = A2(
+			var _p5 = A2(
 				_elm_lang$core$Debug$log,
 				'Landing on: ',
 				A2(_evancz$url_parser$UrlParser$parsePath, _kevinbgreene$elm_tutorial$Main$routeParser, location));
-			if (_p6.ctor === 'Nothing') {
+			if (_p5.ctor === 'Nothing') {
 				return _kevinbgreene$elm_tutorial$Main$HomeRoute;
 			} else {
-				return _p6._0;
+				return _p5._0;
 			}
 		}();
-		var _p7 = maybeString;
-		if (_p7.ctor === 'Just') {
+		var _p6 = maybeString;
+		if (_p6.ctor === 'Just') {
 			return _kevinbgreene$elm_tutorial$Main$updateModel(
-				A2(_kevinbgreene$elm_tutorial$Main$parametersFromString, route, _p7._0));
+				A2(_kevinbgreene$elm_tutorial$Main$parametersFromString, route, _p6._0));
 		} else {
 			return _kevinbgreene$elm_tutorial$Main$updateModel(
 				_kevinbgreene$elm_tutorial$Main$initialModel(route));
@@ -10207,11 +10211,11 @@ var _kevinbgreene$elm_tutorial$Main$FollowRoute = function (a) {
 var _kevinbgreene$elm_tutorial$Main$urlParser = function (location) {
 	var parsed = A2(_evancz$url_parser$UrlParser$parsePath, _kevinbgreene$elm_tutorial$Main$routeParser, location);
 	var l = A2(_elm_lang$core$Debug$log, 'location', location);
-	var _p8 = A2(_elm_lang$core$Debug$log, 'parsed', parsed);
-	if (_p8.ctor === 'Nothing') {
+	var _p7 = A2(_elm_lang$core$Debug$log, 'parsed', parsed);
+	if (_p7.ctor === 'Nothing') {
 		return _kevinbgreene$elm_tutorial$Main$FollowRoute(_kevinbgreene$elm_tutorial$Main$NotFound);
 	} else {
-		return _kevinbgreene$elm_tutorial$Main$FollowRoute(_p8._0);
+		return _kevinbgreene$elm_tutorial$Main$FollowRoute(_p7._0);
 	}
 };
 var _kevinbgreene$elm_tutorial$Main$main = A2(

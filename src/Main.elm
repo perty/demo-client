@@ -4,7 +4,7 @@ import Html exposing (Html, a, div, h1, text)
 import Html.Attributes exposing (class, href, type_)
 import Html.Events exposing (onClick)
 import Navigation
-import UrlParser exposing ((</>))
+import UrlParser exposing ((<?>))
 
 
 main : Program (Maybe String) Model Msg
@@ -33,18 +33,18 @@ port removeStorage : String -> Cmd msg
 
 type alias Model =
     { route : Route
-    , code : String
-    , token : String
-    , jwt : String
+    , code : Maybe String
+    , token : Maybe String
+    , jwt : Maybe String
     }
 
 
 initialModel : Route -> Model
 initialModel route =
     { route = route
-    , code = ""
-    , token = ""
-    , jwt = ""
+    , code = Nothing
+    , token = Nothing
+    , jwt = Nothing
     }
 
 
@@ -104,9 +104,9 @@ updateModel model =
 
 type Route
     = HomeRoute
-    | CodeRoute String
-    | TokenRoute String
-    | JwtRoute String
+    | CodeRoute (Maybe String)
+    | TokenRoute (Maybe String)
+    | JwtRoute (Maybe String)
     | NotFound
 
 
@@ -142,22 +142,17 @@ parametersFromString route string =
     }
 
 
-pick : Int -> List String -> String
+pick : Int -> List String -> Maybe String
 pick n list =
     if n == 1 then
-        case List.head list of
-            Just head ->
-                head
-
-            Nothing ->
-                ""
+        List.head list
     else
         case List.tail list of
             Just tail ->
                 pick (n - 1) tail
 
             Nothing ->
-                ""
+                Nothing
 
 
 parametersToString : Model -> String
@@ -167,9 +162,9 @@ parametersToString model =
             Debug.log "Parameters to String" model
     in
     String.join ":"
-        [ model.code
-        , model.token
-        , model.jwt
+        [ Maybe.withDefault "" model.code
+        , Maybe.withDefault "" model.token
+        , Maybe.withDefault "" model.jwt
         ]
 
 
@@ -239,19 +234,19 @@ homeParser =
         ]
 
 
-codeParser : UrlParser.Parser (String -> a) a
+codeParser : UrlParser.Parser (Maybe String -> a) a
 codeParser =
-    UrlParser.s "code" </> UrlParser.string
+    UrlParser.s "code" <?> UrlParser.stringParam "code"
 
 
-tokenParser : UrlParser.Parser (String -> a) a
+tokenParser : UrlParser.Parser (Maybe String -> a) a
 tokenParser =
-    UrlParser.s "token" </> UrlParser.string
+    UrlParser.s "token" <?> UrlParser.stringParam "token"
 
 
-jwtParser : UrlParser.Parser (String -> a) a
+jwtParser : UrlParser.Parser (Maybe String -> a) a
 jwtParser =
-    UrlParser.s "jwt" </> UrlParser.string
+    UrlParser.s "jwt" <?> UrlParser.stringParam "jwt"
 
 
 
@@ -277,15 +272,16 @@ header =
         ]
 
 
+viewData : Model -> Html Msg
 viewData model =
     div []
         [ div []
-            [ text ("Code: " ++ model.code)
+            [ text ("Code: " ++ Maybe.withDefault "" model.code)
             ]
         , div []
-            [ text ("Token: " ++ model.token)
+            [ text ("Token: " ++ Maybe.withDefault "" model.token)
             ]
         , div []
-            [ text ("JWT: " ++ model.jwt)
+            [ text ("JWT: " ++ Maybe.withDefault "" model.jwt)
             ]
         ]
