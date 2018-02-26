@@ -1,7 +1,7 @@
 port module Main exposing (..)
 
-import Html exposing (a, Html, div, h1, text)
-import Html.Attributes exposing (class, type_, href)
+import Html exposing (Html, a, div, h1, text)
+import Html.Attributes exposing (class, href, type_)
 import Html.Events exposing (onClick)
 import Navigation
 import UrlParser exposing ((</>))
@@ -17,6 +17,7 @@ main =
         }
 
 
+
 -- Ports
 
 
@@ -24,6 +25,8 @@ port setStorage : String -> Cmd msg
 
 
 port removeStorage : String -> Cmd msg
+
+
 
 -- MODEL
 
@@ -52,25 +55,27 @@ initialModel route =
 init : Maybe String -> Navigation.Location -> ( Model, Cmd Msg )
 init maybeString location =
     let
-        newModel = findRouteOrGoHome maybeString location
+        newModel =
+            findRouteOrGoHome maybeString location
     in
-    (newModel,  Cmd.batch [setStorage (parametersToString newModel)] )
+    ( newModel, Cmd.batch [ setStorage (parametersToString newModel) ] )
 
 
-findRouteOrGoHome : Maybe String ->Navigation.Location -> Model
+findRouteOrGoHome : Maybe String -> Navigation.Location -> Model
 findRouteOrGoHome maybeString location =
     let
         route =
             case Debug.log "Landing on: " (UrlParser.parsePath routeParser location) of
-            Nothing ->
-                HomeRoute
+                Nothing ->
+                    HomeRoute
 
-            Just route ->
-                route
+                Just route ->
+                    route
     in
     case maybeString of
         Just something ->
             updateModel (parametersFromString route something)
+
         Nothing ->
             updateModel (initialModel route)
 
@@ -112,6 +117,7 @@ type Route
 type Msg
     = FollowRoute Route
 
+
 updateWithStorage : Msg -> Model -> ( Model, Cmd Msg )
 updateWithStorage msg model =
     let
@@ -122,17 +128,17 @@ updateWithStorage msg model =
     , Cmd.batch [ commands, setStorage (parametersToString newModel) ]
     )
 
+
 parametersFromString : Route -> String -> Model
 parametersFromString route string =
     let
         list =
             Debug.log "list" (String.split ":" string)
     in
-    {
-        route = route
-        , code = (pick 1 list)
-        , token = (pick 2 list)
-        , jwt = (pick 3 list)
+    { route = route
+    , code = pick 1 list
+    , token = pick 2 list
+    , jwt = pick 3 list
     }
 
 
@@ -153,6 +159,7 @@ pick n list =
             Nothing ->
                 ""
 
+
 parametersToString : Model -> String
 parametersToString model =
     let
@@ -161,8 +168,8 @@ parametersToString model =
     in
     String.join ":"
         [ model.code
-        ,model.token
-        ,model.jwt
+        , model.token
+        , model.jwt
         ]
 
 
@@ -262,12 +269,12 @@ view model =
 
 header : Html Msg
 header =
-    div [] [ h1 [] [ text "Demo client" ]
-     , a[  href "https://curity-slave-oauth-test1.ocp.hh.atg.se/oauth/authorize?client_id=atg&response_type=code&scope=read&redirect_uri=http://localhost:8080/code"]
-     [
-        text "Login"
+    div []
+        [ h1 [] [ text "Demo client" ]
+        , a [ href "https://curity-slave-oauth-test1.ocp.hh.atg.se/oauth/authorize?client_id=atg&response_type=code&scope=read&redirect_uri=http://localhost:8080/code" ]
+            [ text "Login"
+            ]
         ]
-     ]
 
 
 viewData model =
