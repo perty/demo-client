@@ -13,7 +13,7 @@ main =
         { init = init
         , view = view
         , update = updateWithStorage
-        , subscriptions = subscriptions
+        , subscriptions = always Sub.none
         }
 
 
@@ -51,17 +51,24 @@ initialModel route =
 
 init : Maybe String -> Navigation.Location -> ( Model, Cmd Msg )
 init maybeString location =
-    ( findRouteOrGoHome location, Cmd.none )
+    let
+        newModel = findRouteOrGoHome maybeString location
+    in
+    (newModel,  Cmd.batch [setStorage (parametersToString newModel)] )
 
 
-findRouteOrGoHome : Navigation.Location -> Model
-findRouteOrGoHome location =
+findRouteOrGoHome : Maybe String ->Navigation.Location -> Model
+findRouteOrGoHome maybeString location =
     case Debug.log "Landing on: " (UrlParser.parsePath routeParser location) of
         Nothing ->
             (initialModel HomeRoute)
 
         Just route ->
-            updateModel (initialModel route)
+            case maybeString of
+                Just something ->
+                    updateModel (parametersFromString route something)
+                Nothing ->
+                    updateModel (initialModel route)
 
 
 updateModel model =
@@ -111,14 +118,14 @@ updateWithStorage msg model =
     , Cmd.batch [ commands, setStorage (parametersToString newModel) ]
     )
 
-parametersFromString : String -> Model
-parametersFromString string =
+parametersFromString : Route -> String -> Model
+parametersFromString route string =
     let
         list =
             Debug.log "list" (String.split ":" string)
     in
     {
-        route = HomeRoute
+        route = route
         , code = (pick 1 list)
         , token = (pick 2 list)
         , jwt = (pick 3 list)
@@ -271,13 +278,3 @@ viewData model =
             [ text ("JWT: " ++ model.jwt)
             ]
         ]
-
-
-
--- SUBSCRIPTIONS
--- No subscriptions
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none

@@ -9876,9 +9876,6 @@ var _evancz$url_parser$UrlParser$intParam = function (name) {
 	return A2(_evancz$url_parser$UrlParser$customParam, name, _evancz$url_parser$UrlParser$intParamHelp);
 };
 
-var _kevinbgreene$elm_tutorial$Main$subscriptions = function (model) {
-	return _elm_lang$core$Platform_Sub$none;
-};
 var _kevinbgreene$elm_tutorial$Main$viewData = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -10066,6 +10063,19 @@ var _kevinbgreene$elm_tutorial$Main$pick = F2(
 			}
 		}
 	});
+var _kevinbgreene$elm_tutorial$Main$parametersFromString = F2(
+	function (route, string) {
+		var list = A2(
+			_elm_lang$core$Debug$log,
+			'list',
+			A2(_elm_lang$core$String$split, ':', string));
+		return {
+			route: route,
+			code: A2(_kevinbgreene$elm_tutorial$Main$pick, 1, list),
+			token: A2(_kevinbgreene$elm_tutorial$Main$pick, 2, list),
+			jwt: A2(_kevinbgreene$elm_tutorial$Main$pick, 3, list)
+		};
+	});
 var _kevinbgreene$elm_tutorial$Main$updateModel = function (model) {
 	var _p4 = model.route;
 	switch (_p4.ctor) {
@@ -10136,18 +10146,6 @@ var _kevinbgreene$elm_tutorial$Main$CodeRoute = function (a) {
 	return {ctor: 'CodeRoute', _0: a};
 };
 var _kevinbgreene$elm_tutorial$Main$HomeRoute = {ctor: 'HomeRoute'};
-var _kevinbgreene$elm_tutorial$Main$parametersFromString = function (string) {
-	var list = A2(
-		_elm_lang$core$Debug$log,
-		'list',
-		A2(_elm_lang$core$String$split, ':', string));
-	return {
-		route: _kevinbgreene$elm_tutorial$Main$HomeRoute,
-		code: A2(_kevinbgreene$elm_tutorial$Main$pick, 1, list),
-		token: A2(_kevinbgreene$elm_tutorial$Main$pick, 2, list),
-		jwt: A2(_kevinbgreene$elm_tutorial$Main$pick, 3, list)
-	};
-};
 var _kevinbgreene$elm_tutorial$Main$routeParser = _evancz$url_parser$UrlParser$oneOf(
 	{
 		ctor: '::',
@@ -10166,24 +10164,39 @@ var _kevinbgreene$elm_tutorial$Main$routeParser = _evancz$url_parser$UrlParser$o
 			}
 		}
 	});
-var _kevinbgreene$elm_tutorial$Main$findRouteOrGoHome = function (location) {
-	var _p6 = A2(
-		_elm_lang$core$Debug$log,
-		'Landing on: ',
-		A2(_evancz$url_parser$UrlParser$parsePath, _kevinbgreene$elm_tutorial$Main$routeParser, location));
-	if (_p6.ctor === 'Nothing') {
-		return _kevinbgreene$elm_tutorial$Main$initialModel(_kevinbgreene$elm_tutorial$Main$HomeRoute);
-	} else {
-		return _kevinbgreene$elm_tutorial$Main$updateModel(
-			_kevinbgreene$elm_tutorial$Main$initialModel(_p6._0));
-	}
-};
+var _kevinbgreene$elm_tutorial$Main$findRouteOrGoHome = F2(
+	function (maybeString, location) {
+		var _p6 = A2(
+			_elm_lang$core$Debug$log,
+			'Landing on: ',
+			A2(_evancz$url_parser$UrlParser$parsePath, _kevinbgreene$elm_tutorial$Main$routeParser, location));
+		if (_p6.ctor === 'Nothing') {
+			return _kevinbgreene$elm_tutorial$Main$initialModel(_kevinbgreene$elm_tutorial$Main$HomeRoute);
+		} else {
+			var _p8 = _p6._0;
+			var _p7 = maybeString;
+			if (_p7.ctor === 'Just') {
+				return _kevinbgreene$elm_tutorial$Main$updateModel(
+					A2(_kevinbgreene$elm_tutorial$Main$parametersFromString, _p8, _p7._0));
+			} else {
+				return _kevinbgreene$elm_tutorial$Main$updateModel(
+					_kevinbgreene$elm_tutorial$Main$initialModel(_p8));
+			}
+		}
+	});
 var _kevinbgreene$elm_tutorial$Main$init = F2(
 	function (maybeString, location) {
+		var newModel = A2(_kevinbgreene$elm_tutorial$Main$findRouteOrGoHome, maybeString, location);
 		return {
 			ctor: '_Tuple2',
-			_0: _kevinbgreene$elm_tutorial$Main$findRouteOrGoHome(location),
-			_1: _elm_lang$core$Platform_Cmd$none
+			_0: newModel,
+			_1: _elm_lang$core$Platform_Cmd$batch(
+				{
+					ctor: '::',
+					_0: _kevinbgreene$elm_tutorial$Main$setStorage(
+						_kevinbgreene$elm_tutorial$Main$parametersToString(newModel)),
+					_1: {ctor: '[]'}
+				})
 		};
 	});
 var _kevinbgreene$elm_tutorial$Main$FollowRoute = function (a) {
@@ -10192,17 +10205,22 @@ var _kevinbgreene$elm_tutorial$Main$FollowRoute = function (a) {
 var _kevinbgreene$elm_tutorial$Main$urlParser = function (location) {
 	var parsed = A2(_evancz$url_parser$UrlParser$parsePath, _kevinbgreene$elm_tutorial$Main$routeParser, location);
 	var l = A2(_elm_lang$core$Debug$log, 'location', location);
-	var _p7 = A2(_elm_lang$core$Debug$log, 'parsed', parsed);
-	if (_p7.ctor === 'Nothing') {
+	var _p9 = A2(_elm_lang$core$Debug$log, 'parsed', parsed);
+	if (_p9.ctor === 'Nothing') {
 		return _kevinbgreene$elm_tutorial$Main$FollowRoute(_kevinbgreene$elm_tutorial$Main$NotFound);
 	} else {
-		return _kevinbgreene$elm_tutorial$Main$FollowRoute(_p7._0);
+		return _kevinbgreene$elm_tutorial$Main$FollowRoute(_p9._0);
 	}
 };
 var _kevinbgreene$elm_tutorial$Main$main = A2(
 	_elm_lang$navigation$Navigation$programWithFlags,
 	_kevinbgreene$elm_tutorial$Main$urlParser,
-	{init: _kevinbgreene$elm_tutorial$Main$init, view: _kevinbgreene$elm_tutorial$Main$view, update: _kevinbgreene$elm_tutorial$Main$updateWithStorage, subscriptions: _kevinbgreene$elm_tutorial$Main$subscriptions})(
+	{
+		init: _kevinbgreene$elm_tutorial$Main$init,
+		view: _kevinbgreene$elm_tutorial$Main$view,
+		update: _kevinbgreene$elm_tutorial$Main$updateWithStorage,
+		subscriptions: _elm_lang$core$Basics$always(_elm_lang$core$Platform_Sub$none)
+	})(
 	_elm_lang$core$Json_Decode$oneOf(
 		{
 			ctor: '::',
