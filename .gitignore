@@ -2,4 +2,4 @@
 app.js
 *.iml
 elm-stuff/
-
+node_modules/
