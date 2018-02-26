@@ -24,9 +24,6 @@ main =
 port setStorage : String -> Cmd msg
 
 
-port removeStorage : String -> Cmd msg
-
-
 
 -- MODEL
 

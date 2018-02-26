@@ -2,9 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Elm SPA Navigation</title>
-  <link rel="stylesheet" href="/assets/basic.css" />
-  <link rel="stylesheet" href="/assets/fluidity.css" />
+  <title>Demo client</title>
 </head>
 <body>
   <script src="/app.js"></script>
@@ -18,9 +16,6 @@
           localStorage.setItem('model', JSON.stringify(state));
       });
 
-      elmApp.ports.removeStorage.subscribe(function() {
-          localStorage.removeItem('model');
-      });
   </script>
 </body>
 </html>

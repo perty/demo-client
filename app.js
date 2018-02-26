@@ -10130,11 +10130,6 @@ var _kevinbgreene$elm_tutorial$Main$updateWithStorage = F2(
 				})
 		};
 	});
-var _kevinbgreene$elm_tutorial$Main$removeStorage = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeStorage',
-	function (v) {
-		return v;
-	});
 var _kevinbgreene$elm_tutorial$Main$Model = F4(
 	function (a, b, c, d) {
 		return {route: a, code: b, token: c, jwt: d};
