@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Html exposing (a, Html, div, h1, text)
 import Html.Attributes exposing (class, type_, href)
@@ -7,16 +7,23 @@ import Navigation
 import UrlParser exposing ((</>))
 
 
-main : Program Never Model Msg
+main : Program (Maybe String) Model Msg
 main =
-    Navigation.program urlParser
+    Navigation.programWithFlags urlParser
         { init = init
         , view = view
-        , update = update
+        , update = updateWithStorage
         , subscriptions = subscriptions
         }
 
 
+-- Ports
+
+
+port setStorage : String -> Cmd msg
+
+
+port removeStorage : String -> Cmd msg
 
 -- MODEL
 
@@ -42,8 +49,8 @@ initialModel route =
 -- Start from a location, not necessarily "/".
 
 
-init : Navigation.Location -> ( Model, Cmd Msg )
-init location =
+init : Maybe String -> Navigation.Location -> ( Model, Cmd Msg )
+init maybeString location =
     ( findRouteOrGoHome location, Cmd.none )
 
 
@@ -93,6 +100,59 @@ type Route
 
 type Msg
     = FollowRoute Route
+
+updateWithStorage : Msg -> Model -> ( Model, Cmd Msg )
+updateWithStorage msg model =
+    let
+        ( newModel, commands ) =
+            update msg model
+    in
+    ( newModel
+    , Cmd.batch [ commands, setStorage (parametersToString newModel) ]
+    )
+
+parametersFromString : String -> Model
+parametersFromString string =
+    let
+        list =
+            Debug.log "list" (String.split ":" string)
+    in
+    {
+        route = HomeRoute
+        , code = (pick 1 list)
+        , token = (pick 2 list)
+        , jwt = (pick 3 list)
+    }
+
+
+pick : Int -> List String -> String
+pick n list =
+    if n == 1 then
+        case List.head list of
+            Just head ->
+                head
+
+            Nothing ->
+                ""
+    else
+        case List.tail list of
+            Just tail ->
+                pick (n - 1) tail
+
+            Nothing ->
+                ""
+
+parametersToString : Model -> String
+parametersToString model =
+    let
+        p =
+            Debug.log "Parameters to String" model
+    in
+    String.join ":"
+        [ model.code
+        ,model.token
+        ,model.jwt
+        ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

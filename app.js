@@ -10022,21 +10022,65 @@ var _kevinbgreene$elm_tutorial$Main$update = F2(
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
 	});
+var _kevinbgreene$elm_tutorial$Main$parametersToString = function (model) {
+	var p = A2(_elm_lang$core$Debug$log, 'Parameters to String', model);
+	return A2(
+		_elm_lang$core$String$join,
+		':',
+		{
+			ctor: '::',
+			_0: model.code,
+			_1: {
+				ctor: '::',
+				_0: model.token,
+				_1: {
+					ctor: '::',
+					_0: model.jwt,
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _kevinbgreene$elm_tutorial$Main$pick = F2(
+	function (n, list) {
+		pick:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.eq(n, 1)) {
+				var _p2 = _elm_lang$core$List$head(list);
+				if (_p2.ctor === 'Just') {
+					return _p2._0;
+				} else {
+					return '';
+				}
+			} else {
+				var _p3 = _elm_lang$core$List$tail(list);
+				if (_p3.ctor === 'Just') {
+					var _v4 = n - 1,
+						_v5 = _p3._0;
+					n = _v4;
+					list = _v5;
+					continue pick;
+				} else {
+					return '';
+				}
+			}
+		}
+	});
 var _kevinbgreene$elm_tutorial$Main$updateModel = function (model) {
-	var _p2 = model.route;
-	switch (_p2.ctor) {
+	var _p4 = model.route;
+	switch (_p4.ctor) {
 		case 'CodeRoute':
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{code: _p2._0});
+				{code: _p4._0});
 		case 'TokenRoute':
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{token: _p2._0});
+				{token: _p4._0});
 		case 'JwtRoute':
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{jwt: _p2._0});
+				{jwt: _p4._0});
 		case 'HomeRoute':
 			return model;
 		default:
@@ -10046,6 +10090,37 @@ var _kevinbgreene$elm_tutorial$Main$updateModel = function (model) {
 var _kevinbgreene$elm_tutorial$Main$initialModel = function (route) {
 	return {route: route, code: '', token: '', jwt: ''};
 };
+var _kevinbgreene$elm_tutorial$Main$setStorage = _elm_lang$core$Native_Platform.outgoingPort(
+	'setStorage',
+	function (v) {
+		return v;
+	});
+var _kevinbgreene$elm_tutorial$Main$updateWithStorage = F2(
+	function (msg, model) {
+		var _p5 = A2(_kevinbgreene$elm_tutorial$Main$update, msg, model);
+		var newModel = _p5._0;
+		var commands = _p5._1;
+		return {
+			ctor: '_Tuple2',
+			_0: newModel,
+			_1: _elm_lang$core$Platform_Cmd$batch(
+				{
+					ctor: '::',
+					_0: commands,
+					_1: {
+						ctor: '::',
+						_0: _kevinbgreene$elm_tutorial$Main$setStorage(
+							_kevinbgreene$elm_tutorial$Main$parametersToString(newModel)),
+						_1: {ctor: '[]'}
+					}
+				})
+		};
+	});
+var _kevinbgreene$elm_tutorial$Main$removeStorage = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeStorage',
+	function (v) {
+		return v;
+	});
 var _kevinbgreene$elm_tutorial$Main$Model = F4(
 	function (a, b, c, d) {
 		return {route: a, code: b, token: c, jwt: d};
@@ -10061,6 +10136,18 @@ var _kevinbgreene$elm_tutorial$Main$CodeRoute = function (a) {
 	return {ctor: 'CodeRoute', _0: a};
 };
 var _kevinbgreene$elm_tutorial$Main$HomeRoute = {ctor: 'HomeRoute'};
+var _kevinbgreene$elm_tutorial$Main$parametersFromString = function (string) {
+	var list = A2(
+		_elm_lang$core$Debug$log,
+		'list',
+		A2(_elm_lang$core$String$split, ':', string));
+	return {
+		route: _kevinbgreene$elm_tutorial$Main$HomeRoute,
+		code: A2(_kevinbgreene$elm_tutorial$Main$pick, 1, list),
+		token: A2(_kevinbgreene$elm_tutorial$Main$pick, 2, list),
+		jwt: A2(_kevinbgreene$elm_tutorial$Main$pick, 3, list)
+	};
+};
 var _kevinbgreene$elm_tutorial$Main$routeParser = _evancz$url_parser$UrlParser$oneOf(
 	{
 		ctor: '::',
@@ -10080,41 +10167,52 @@ var _kevinbgreene$elm_tutorial$Main$routeParser = _evancz$url_parser$UrlParser$o
 		}
 	});
 var _kevinbgreene$elm_tutorial$Main$findRouteOrGoHome = function (location) {
-	var _p3 = A2(
+	var _p6 = A2(
 		_elm_lang$core$Debug$log,
 		'Landing on: ',
 		A2(_evancz$url_parser$UrlParser$parsePath, _kevinbgreene$elm_tutorial$Main$routeParser, location));
-	if (_p3.ctor === 'Nothing') {
+	if (_p6.ctor === 'Nothing') {
 		return _kevinbgreene$elm_tutorial$Main$initialModel(_kevinbgreene$elm_tutorial$Main$HomeRoute);
 	} else {
 		return _kevinbgreene$elm_tutorial$Main$updateModel(
-			_kevinbgreene$elm_tutorial$Main$initialModel(_p3._0));
+			_kevinbgreene$elm_tutorial$Main$initialModel(_p6._0));
 	}
 };
-var _kevinbgreene$elm_tutorial$Main$init = function (location) {
-	return {
-		ctor: '_Tuple2',
-		_0: _kevinbgreene$elm_tutorial$Main$findRouteOrGoHome(location),
-		_1: _elm_lang$core$Platform_Cmd$none
-	};
-};
+var _kevinbgreene$elm_tutorial$Main$init = F2(
+	function (maybeString, location) {
+		return {
+			ctor: '_Tuple2',
+			_0: _kevinbgreene$elm_tutorial$Main$findRouteOrGoHome(location),
+			_1: _elm_lang$core$Platform_Cmd$none
+		};
+	});
 var _kevinbgreene$elm_tutorial$Main$FollowRoute = function (a) {
 	return {ctor: 'FollowRoute', _0: a};
 };
 var _kevinbgreene$elm_tutorial$Main$urlParser = function (location) {
 	var parsed = A2(_evancz$url_parser$UrlParser$parsePath, _kevinbgreene$elm_tutorial$Main$routeParser, location);
 	var l = A2(_elm_lang$core$Debug$log, 'location', location);
-	var _p4 = A2(_elm_lang$core$Debug$log, 'parsed', parsed);
-	if (_p4.ctor === 'Nothing') {
+	var _p7 = A2(_elm_lang$core$Debug$log, 'parsed', parsed);
+	if (_p7.ctor === 'Nothing') {
 		return _kevinbgreene$elm_tutorial$Main$FollowRoute(_kevinbgreene$elm_tutorial$Main$NotFound);
 	} else {
-		return _kevinbgreene$elm_tutorial$Main$FollowRoute(_p4._0);
+		return _kevinbgreene$elm_tutorial$Main$FollowRoute(_p7._0);
 	}
 };
 var _kevinbgreene$elm_tutorial$Main$main = A2(
-	_elm_lang$navigation$Navigation$program,
+	_elm_lang$navigation$Navigation$programWithFlags,
 	_kevinbgreene$elm_tutorial$Main$urlParser,
-	{init: _kevinbgreene$elm_tutorial$Main$init, view: _kevinbgreene$elm_tutorial$Main$view, update: _kevinbgreene$elm_tutorial$Main$update, subscriptions: _kevinbgreene$elm_tutorial$Main$subscriptions})();
+	{init: _kevinbgreene$elm_tutorial$Main$init, view: _kevinbgreene$elm_tutorial$Main$view, update: _kevinbgreene$elm_tutorial$Main$updateWithStorage, subscriptions: _kevinbgreene$elm_tutorial$Main$subscriptions})(
+	_elm_lang$core$Json_Decode$oneOf(
+		{
+			ctor: '::',
+			_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
+			_1: {
+				ctor: '::',
+				_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
+				_1: {ctor: '[]'}
+			}
+		}));
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
