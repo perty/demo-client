@@ -10166,22 +10166,24 @@ var _kevinbgreene$elm_tutorial$Main$routeParser = _evancz$url_parser$UrlParser$o
 	});
 var _kevinbgreene$elm_tutorial$Main$findRouteOrGoHome = F2(
 	function (maybeString, location) {
-		var _p6 = A2(
-			_elm_lang$core$Debug$log,
-			'Landing on: ',
-			A2(_evancz$url_parser$UrlParser$parsePath, _kevinbgreene$elm_tutorial$Main$routeParser, location));
-		if (_p6.ctor === 'Nothing') {
-			return _kevinbgreene$elm_tutorial$Main$initialModel(_kevinbgreene$elm_tutorial$Main$HomeRoute);
-		} else {
-			var _p8 = _p6._0;
-			var _p7 = maybeString;
-			if (_p7.ctor === 'Just') {
-				return _kevinbgreene$elm_tutorial$Main$updateModel(
-					A2(_kevinbgreene$elm_tutorial$Main$parametersFromString, _p8, _p7._0));
+		var route = function () {
+			var _p6 = A2(
+				_elm_lang$core$Debug$log,
+				'Landing on: ',
+				A2(_evancz$url_parser$UrlParser$parsePath, _kevinbgreene$elm_tutorial$Main$routeParser, location));
+			if (_p6.ctor === 'Nothing') {
+				return _kevinbgreene$elm_tutorial$Main$HomeRoute;
 			} else {
-				return _kevinbgreene$elm_tutorial$Main$updateModel(
-					_kevinbgreene$elm_tutorial$Main$initialModel(_p8));
+				return _p6._0;
 			}
+		}();
+		var _p7 = maybeString;
+		if (_p7.ctor === 'Just') {
+			return _kevinbgreene$elm_tutorial$Main$updateModel(
+				A2(_kevinbgreene$elm_tutorial$Main$parametersFromString, route, _p7._0));
+		} else {
+			return _kevinbgreene$elm_tutorial$Main$updateModel(
+				_kevinbgreene$elm_tutorial$Main$initialModel(route));
 		}
 	});
 var _kevinbgreene$elm_tutorial$Main$init = F2(
@@ -10205,11 +10207,11 @@ var _kevinbgreene$elm_tutorial$Main$FollowRoute = function (a) {
 var _kevinbgreene$elm_tutorial$Main$urlParser = function (location) {
 	var parsed = A2(_evancz$url_parser$UrlParser$parsePath, _kevinbgreene$elm_tutorial$Main$routeParser, location);
 	var l = A2(_elm_lang$core$Debug$log, 'location', location);
-	var _p9 = A2(_elm_lang$core$Debug$log, 'parsed', parsed);
-	if (_p9.ctor === 'Nothing') {
+	var _p8 = A2(_elm_lang$core$Debug$log, 'parsed', parsed);
+	if (_p8.ctor === 'Nothing') {
 		return _kevinbgreene$elm_tutorial$Main$FollowRoute(_kevinbgreene$elm_tutorial$Main$NotFound);
 	} else {
-		return _kevinbgreene$elm_tutorial$Main$FollowRoute(_p9._0);
+		return _kevinbgreene$elm_tutorial$Main$FollowRoute(_p8._0);
 	}
 };
 var _kevinbgreene$elm_tutorial$Main$main = A2(

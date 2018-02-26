@@ -59,16 +59,20 @@ init maybeString location =
 
 findRouteOrGoHome : Maybe String ->Navigation.Location -> Model
 findRouteOrGoHome maybeString location =
-    case Debug.log "Landing on: " (UrlParser.parsePath routeParser location) of
-        Nothing ->
-            (initialModel HomeRoute)
+    let
+        route =
+            case Debug.log "Landing on: " (UrlParser.parsePath routeParser location) of
+            Nothing ->
+                HomeRoute
 
-        Just route ->
-            case maybeString of
-                Just something ->
-                    updateModel (parametersFromString route something)
-                Nothing ->
-                    updateModel (initialModel route)
+            Just route ->
+                route
+    in
+    case maybeString of
+        Just something ->
+            updateModel (parametersFromString route something)
+        Nothing ->
+            updateModel (initialModel route)
 
 
 updateModel model =
